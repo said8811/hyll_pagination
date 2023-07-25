@@ -9,7 +9,7 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
   AdventuresNotifier(this.repository)
       : super(HyllData(
             adventures: [], nextPageUrl: null, state: AdventureState.loading)) {
-    fetchData("https://api.hyll.com/api/adventures/?limit=20&offset=10");
+    fetchData("https://api.hyll.com/api/adventures");
   }
   fetchData(String url) async {
     state = HyllData(

@@ -29,6 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           scrollController.position.pixels != 0 &&
           ref.read(hyllNotifierProvider).state != AdventureState.loading &&
           ref.read(hyllNotifierProvider).nextPageUrl != null) {
+        debugPrint("loading");
         ref.read(hyllNotifierProvider.notifier).fetchNextPage();
       }
     });
