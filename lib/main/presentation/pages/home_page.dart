@@ -6,6 +6,7 @@ import 'package:hyll/main/presentation/widgets/loading_widget.dart';
 import 'package:hyll/main/shared/providers.dart';
 
 import '../../domain/model/hyll_states.dart';
+import '../../infrasturcture/helpers/get_urls.dart';
 import 'adventure_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -84,7 +85,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ));
               },
               child: AdventureWidget(
-                imageUrl: data.adventures[index].contents![0].contentUrl ?? "",
+                imageUrl: getImageURls(data.adventures[index].contents!
+                    .where((element) => element.contentType == "IMAGE")
+                    .toList()),
                 title: data.adventures[index].title ?? "UnNamed",
                 primaryDescription:
                     data.adventures[index].primaryDescription ?? "",
@@ -102,7 +105,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ));
           },
           child: AdventureWidget(
-            imageUrl: data.adventures[index].contents![0].contentUrl ?? "",
+            imageUrl: getImageURls(data.adventures[index].contents!
+                .where((element) => element.contentType == "IMAGE")
+                .toList()),
             title: data.adventures[index].title ?? "UnNamed",
             primaryDescription: data.adventures[index].primaryDescription ?? "",
             tags: data.adventures[index].tags!,

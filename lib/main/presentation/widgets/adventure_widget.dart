@@ -4,9 +4,11 @@ import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'image_indicator.dart';
+
 // ignore: must_be_immutable
 class AdventureWidget extends StatefulWidget {
-  final String imageUrl;
+  final List<String> imageUrl;
   final String title;
   final String primaryDescription;
   final List<String> tags;
@@ -25,7 +27,10 @@ class AdventureWidget extends StatefulWidget {
   State<AdventureWidget> createState() => _AdventureWidgetState();
 }
 
-class _AdventureWidgetState extends State<AdventureWidget> {
+class _AdventureWidgetState extends State<AdventureWidget>
+    with TickerProviderStateMixin {
+  int currentImageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -56,29 +61,50 @@ class _AdventureWidgetState extends State<AdventureWidget> {
         else
           GestureDetector(
             onTap: widget.onTap,
-            child: CachedNetworkImage(
-              imageUrl: widget.imageUrl,
-              imageBuilder: (context, imageProvider) => Container(
-                width: double.infinity,
-                height: 400.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+            child: SizedBox(
+              height: 400,
+              child: PageView.builder(
+                itemCount: widget.imageUrl.length,
+                itemBuilder: (context, index) {
+                  return CachedNetworkImage(
+                    imageUrl: widget.imageUrl[index],
+                    imageBuilder: (context, imageProvider) => Container(
+                      alignment: Alignment.topRight,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 400,
+                        color: Colors.white,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  );
+                },
+                onPageChanged: (value) => setState(() {
+                  currentImageIndex = value;
+                }),
               ),
-              placeholder: (context, url) => Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  height: 400,
-                  color: Colors.white,
-                ),
-              ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
           ),
+        const Gap(10),
+        Center(
+          child: SizedBox(
+            height: 10,
+            child: ImageIndicator(
+                currentindex: currentImageIndex,
+                length: widget.imageUrl.length),
+          ),
+        ),
         const Gap(20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -1,3 +1,5 @@
+import 'hyll_model.dart';
+
 class AdventureModel {
   int? id;
   String? externalAuthor;
@@ -305,32 +307,6 @@ class Badges {
     title = json['title'];
     icon = json['icon'];
     colorScheme = json['color_scheme'];
-  }
-}
-
-class Contents {
-  String? id;
-  String? contentType;
-  String? contentMode;
-  String? contentUrl;
-  bool? isHeaderForThePlan;
-  bool? isPrivate;
-
-  Contents(
-      {this.id,
-      this.contentType,
-      this.contentMode,
-      this.contentUrl,
-      this.isHeaderForThePlan,
-      this.isPrivate});
-
-  Contents.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    contentType = json['content_type'];
-    contentMode = json['content_mode'];
-    contentUrl = json['content_url'];
-    isHeaderForThePlan = json['is_header_for_the_plan'];
-    isPrivate = json['is_private'];
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:video_player/video_player.dart';
 
@@ -50,22 +51,32 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
                   child: VideoPlayer(controller),
                 ),
               ),
-              Positioned(
-                  top: 15,
-                  left: 1,
-                  child: Container(
-                    color: AppColors.primary,
-                    height: 6,
-                    width: 200,
-                    child: VideoProgressIndicator(controller,
-                        allowScrubbing: false,
-                        padding: const EdgeInsets.symmetric(horizontal: 20)),
-                  )),
+              Column(
+                children: [
+                  const Gap(30),
+                  Center(
+                    child: Container(
+                      alignment: Alignment.topCenter,
+                      color: AppColors.white,
+                      height: 2,
+                      width: MediaQuery.of(context).size.width * 0.98,
+                      child: VideoProgressIndicator(controller,
+                          allowScrubbing: false,
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          colors: VideoProgressColors(
+                              playedColor: AppColors.primary,
+                              bufferedColor:
+                                  AppColors.primary.withOpacity(0.4))),
+                    ),
+                  ),
+                ],
+              ),
               if (isVideoEnded)
                 Positioned(
                     right: 1,
                     top: 1,
                     child: IconButton(
+                      padding: const EdgeInsets.all(0),
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(
                         Icons.cancel,
