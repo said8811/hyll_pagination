@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:hyll/main/domain/model/adventure_data.dart';
+import 'package:hyll/main/domain/model/adventure_model.dart';
 import 'package:hyll/main/domain/model/hyll_states.dart';
+import 'package:hyll/main/presentation/pages/video_player.dart';
 import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hyll/main/shared/providers.dart';
@@ -77,12 +79,61 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                 ),
               ),
               AdventureWidget(
-                  imageUrl: data.adventure.startingLocation!.imageUrl ?? "",
+                  onTap: () {
+                    if (data.adventure.contents!
+                        .any((element) => element.contentType == "VIDEO")) {
+                      Contents content = data.adventure.contents!.firstWhere(
+                          (element) => element.contentType == "VIDEO");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPLayPage(
+                              videoUrl: content.contentUrl!,
+                            ),
+                          ));
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "This adventure doesn't have video",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: AppColors.primary,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                    }
+                  },
+                  imageUrl: data.adventure.contents![0].contentUrl ?? "",
                   title: data.adventure.title!,
                   primaryDescription: data.adventure.description!,
                   tags: data.adventure.tags!,
                   id: data.adventure.id.toString()),
               const Gap(10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "Activity",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Gap(8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Text(
+                      data.adventure.activity!,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    Image.network(
+                      data.adventure.activityIcon!,
+                      width: 40,
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(14),
               Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.white),
                 child: ExpansionTile(
@@ -113,6 +164,11 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                     ...List.generate(
                         data.adventure.facts!.length,
                         (index) => ExpansionTile(
+                              leading: Image.network(
+                                data.adventure.facts![index].iconUrl ??
+                                    "https://res.cloudinary.com/hyll/image/upload/v1/media/adventures/icons/slope-uphill_mkva9h_zw6llb",
+                                width: 40,
+                              ),
                               childrenPadding:
                                   const EdgeInsets.symmetric(horizontal: 10),
                               title: Text(data.adventure.facts![index].name!),

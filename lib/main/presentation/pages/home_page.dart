@@ -84,8 +84,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ));
               },
               child: AdventureWidget(
-                imageUrl:
-                    data.adventures[index].startingLocation!.imageUrl ?? "",
+                imageUrl: data.adventures[index].contents![0].contentUrl ?? "",
                 title: data.adventures[index].title ?? "UnNamed",
                 primaryDescription:
                     data.adventures[index].primaryDescription ?? "",
@@ -103,7 +102,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ));
           },
           child: AdventureWidget(
-            imageUrl: data.adventures[index].startingLocation!.imageUrl ?? "",
+            imageUrl: data.adventures[index].contents![0].contentUrl ?? "",
             title: data.adventures[index].title ?? "UnNamed",
             primaryDescription: data.adventures[index].primaryDescription ?? "",
             tags: data.adventures[index].tags!,

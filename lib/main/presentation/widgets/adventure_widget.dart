@@ -4,20 +4,22 @@ import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
+// ignore: must_be_immutable
 class AdventureWidget extends StatefulWidget {
   final String imageUrl;
   final String title;
   final String primaryDescription;
   final List<String> tags;
   final String id;
-  const AdventureWidget({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.primaryDescription,
-    required this.tags,
-    required this.id,
-  });
+  VoidCallback? onTap;
+  AdventureWidget(
+      {super.key,
+      required this.imageUrl,
+      required this.title,
+      required this.primaryDescription,
+      required this.tags,
+      required this.id,
+      this.onTap});
 
   @override
   State<AdventureWidget> createState() => _AdventureWidgetState();
@@ -52,27 +54,30 @@ class _AdventureWidgetState extends State<AdventureWidget> {
             ),
           )
         else
-          CachedNetworkImage(
-            imageUrl: widget.imageUrl,
-            imageBuilder: (context, imageProvider) => Container(
-              width: double.infinity,
-              height: 400.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
+          GestureDetector(
+            onTap: widget.onTap,
+            child: CachedNetworkImage(
+              imageUrl: widget.imageUrl,
+              imageBuilder: (context, imageProvider) => Container(
+                width: double.infinity,
+                height: 400.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            placeholder: (context, url) => Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                height: 400,
-                color: Colors.white,
+              placeholder: (context, url) => Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  height: 400,
+                  color: Colors.white,
+                ),
               ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         const Gap(20),
         Padding(
