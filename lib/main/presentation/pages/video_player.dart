@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:video_player/video_player.dart';
@@ -75,16 +76,15 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
               if (isVideoEnded)
                 Positioned(
                     right: 1,
-                    top: 1,
+                    top: -12,
                     child: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.cancel,
-                        size: 25,
-                        color: AppColors.white,
-                      ),
-                    ))
+                        padding: const EdgeInsets.all(0),
+                        onPressed: () => Navigator.pop(context),
+                        icon: SvgPicture.asset(
+                          "assets/svg/close.svg",
+                          // ignore: deprecated_member_use
+                          color: AppColors.white,
+                        )))
             ],
           ),
         ),
