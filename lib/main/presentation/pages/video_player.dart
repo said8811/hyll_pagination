@@ -52,8 +52,8 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
                 ),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Gap(30),
                   Center(
                     child: Container(
                       alignment: Alignment.topCenter,
@@ -61,7 +61,7 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
                       height: 2,
                       width: MediaQuery.of(context).size.width * 0.98,
                       child: VideoProgressIndicator(controller,
-                          allowScrubbing: false,
+                          allowScrubbing: true,
                           padding: const EdgeInsets.symmetric(horizontal: 0),
                           colors: VideoProgressColors(
                               playedColor: AppColors.primary,
@@ -69,6 +69,7 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
                                   AppColors.primary.withOpacity(0.4))),
                     ),
                   ),
+                  const Gap(20)
                 ],
               ),
               if (isVideoEnded)
