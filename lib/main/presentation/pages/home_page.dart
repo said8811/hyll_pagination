@@ -42,6 +42,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const SizedBox(),
         centerTitle: true,
         title: const Text(
           "Hyll",

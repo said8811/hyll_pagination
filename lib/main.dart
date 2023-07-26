@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hyll/main/presentation/pages/home_page.dart';
+import 'package:get/get.dart';
+import 'package:hyll/splash/presentation/splash_page.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -11,13 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Hyll',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: const HomePage());
+    return GetMaterialApp(
+      title: 'Hyll',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const SplashPage(),
+    );
   }
 }
