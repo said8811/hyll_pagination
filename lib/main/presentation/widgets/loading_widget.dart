@@ -10,25 +10,29 @@ class ShimmerLoading extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
-      child: Column(
-        children: [
-          Container(
-            height: 400,
-            color: Colors.white,
-          ),
-          const Gap(20),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            height: 20,
-            color: Colors.white,
-          ),
-          const Gap(20),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            height: 60,
-            color: Colors.white,
-          )
-        ],
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.all(100),
+            ),
+            const Gap(20),
+            Container(
+              height: 20,
+              margin: const EdgeInsets.only(right: 100),
+              color: Colors.white,
+            ),
+            const Gap(20),
+            Container(
+              height: 20,
+              margin: const EdgeInsets.only(right: 160),
+              color: Colors.white,
+            )
+          ],
+        ),
       ),
     );
   }

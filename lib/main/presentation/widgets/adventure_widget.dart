@@ -81,8 +81,11 @@ class _AdventureWidgetState extends State<AdventureWidget>
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
                     child: Container(
-                      height: 400,
-                      color: Colors.white,
+                      padding: const EdgeInsets.all(100),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -92,12 +95,19 @@ class _AdventureWidgetState extends State<AdventureWidget>
             children: [
               const Gap(2),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.title,
-                    textAlign: TextAlign.left,
-                    style: fontPoppinsW500(appcolor: AppColors.textColor)
-                        .copyWith(fontSize: 14),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 235),
+                    padding: const EdgeInsets.only(right: 0),
+                    child: Text(
+                      widget.title,
+                      textAlign: TextAlign.left,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: fontPoppinsW500(appcolor: AppColors.textColor)
+                          .copyWith(fontSize: 14),
+                    ),
                   ),
                   const Gap(10),
                   Text(
@@ -110,8 +120,26 @@ class _AdventureWidgetState extends State<AdventureWidget>
               ),
               const Spacer(),
               Container(
-                decoration: BoxDecoration(color: AppColors.textColor),
-                child: const Text("4.6"),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                    color: AppColors.textColor.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.star_border_purple500_rounded,
+                      size: 20,
+                      color: Colors.yellow,
+                    ),
+                    const Gap(4),
+                    Text(
+                      "4.6",
+                      style: fontPoppinsW400(appcolor: AppColors.white)
+                          .copyWith(fontSize: 10),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

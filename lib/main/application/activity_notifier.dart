@@ -6,8 +6,10 @@ import '../domain/model/adventure_data.dart';
 
 class ActivityNotifier extends StateNotifier<ActivityData> {
   final HyllDataRepository repository;
-  ActivityNotifier({required this.repository})
-      : super(ActivityData(activites: [], state: AdventureState.loading));
+  ActivityNotifier(this.repository)
+      : super(ActivityData(activites: [], state: AdventureState.loading)) {
+    getActivities();
+  }
   getActivities() async {
     final adventureOrFailure = await repository.getActivity();
 

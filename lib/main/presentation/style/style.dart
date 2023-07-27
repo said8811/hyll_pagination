@@ -34,10 +34,7 @@ TextStyle fontPoppinsW600({required Color appcolor}) {
 
 TextStyle fontPoppinsW500({required Color appcolor}) {
   return TextStyle(
-      fontSize: 18,
-      color: appcolor,
-      fontWeight: FontWeight.w500,
-      fontFamily: "Poppins");
+      color: appcolor, fontWeight: FontWeight.w500, fontFamily: "Poppins");
 }
 
 TextStyle fontPoppinsW400({required Color appcolor}) {

@@ -6,7 +6,9 @@ import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
 import 'package:hyll/main/presentation/widgets/loading_widget.dart';
 import 'package:hyll/main/shared/providers.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../domain/model/adventure_data.dart';
 import '../../domain/model/hyll_states.dart';
 import '../style/style.dart';
 import 'adventure_page.dart';
@@ -41,6 +43,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final adventureData = ref.watch(hyllNotifierProvider);
+    final activityData = ref.watch(activityNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -77,6 +80,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                       .copyWith(fontSize: 12)),
             ),
             const Gap(20),
+            SizedBox(
+              height: 30,
+              child: ListView.separated(
+                  separatorBuilder: (context, index) => const Gap(5),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _activityItemsCount(activityData),
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) =>
+                      _buildActivity(activityData, index)),
+            ),
+            const Gap(20),
             Expanded(
               child: ListView.separated(
                 separatorBuilder: (context, index) => const Gap(10),
@@ -102,6 +116,47 @@ class _HomePageState extends ConsumerState<HomePage> {
     };
   }
 
+  int _activityItemsCount(ActivityData data) {
+    return switch (data.state) {
+      (AdventureState.loading) => 10,
+      (AdventureState.loaded) => data.activites.length,
+      (AdventureState.error) => 0
+    };
+  }
+
+  Widget _buildActivity(ActivityData data, int index) {
+    return switch (data.state) {
+      (AdventureState.loading) => Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 15,
+            width: 60,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: AppColors.white,
+            ),
+          ),
+        ),
+      (AdventureState.loaded) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: AppColors.white,
+          ),
+          child: Center(
+            child: Text(
+              data.activites[index].name,
+              style: fontPoppinsW400(appcolor: AppColors.textColor)
+                  .copyWith(fontSize: 12),
+            ),
+          ),
+        ),
+      (AdventureState.error) => const SizedBox()
+    };
+  }
+
   Widget _buildList(HyllData data, int index) {
     return switch (data.state) {
       (AdventureState.loading) => data.adventures.length <= index
@@ -117,9 +172,11 @@ class _HomePageState extends ConsumerState<HomePage> {
               },
               child: AdventureWidget(
                 imageUrl: data.adventures[index].contents![0].contentUrl!,
-                title: data.adventures[index].title ?? "UnNamed",
+                title:
+                    data.adventures[index].startingLocation!.name ?? "UnNamed",
                 primaryDescription:
-                    data.adventures[index].primaryDescription ?? "",
+                    data.adventures[index].startingLocation!.subtitle ??
+                        "Liechtenstin",
                 tags: data.adventures[index].tags!,
                 id: data.adventures[index].id.toString(),
               ),

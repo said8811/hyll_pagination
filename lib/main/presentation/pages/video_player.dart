@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hyll/main/presentation/style/colors.dart';
@@ -40,6 +41,9 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light));
     if (controller.value.isInitialized) {
       return Scaffold(
         backgroundColor: Colors.black,
@@ -69,7 +73,7 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
                           allowScrubbing: true,
                           padding: const EdgeInsets.symmetric(horizontal: 0),
                           colors: VideoProgressColors(
-                              playedColor: AppColors.primary,
+                              playedColor: AppColors.gradientSecond,
                               bufferedColor:
                                   AppColors.primary.withOpacity(0.4))),
                     ),
