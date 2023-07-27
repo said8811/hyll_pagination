@@ -8,9 +8,9 @@ import 'package:hyll/main/presentation/widgets/loading_widget.dart';
 import 'package:hyll/main/shared/providers.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../domain/model/adventure_data.dart';
 import '../../domain/model/hyll_states.dart';
 import '../style/style.dart';
+import '../widgets/activity_widget.dart';
 import 'adventure_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -22,6 +22,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   ScrollController scrollController = ScrollController();
+  int selectedActivity = 0;
 
   @override
   void initState() {
@@ -43,7 +44,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final adventureData = ref.watch(hyllNotifierProvider);
-    final activityData = ref.watch(activityNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,6 +59,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(color: AppColors.bgColor),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               decoration: InputDecoration(
@@ -83,12 +84,12 @@ class _HomePageState extends ConsumerState<HomePage> {
             SizedBox(
               height: 30,
               child: ListView.separated(
-                  separatorBuilder: (context, index) => const Gap(5),
+                  separatorBuilder: (context, index) => const Gap(10),
                   scrollDirection: Axis.horizontal,
-                  itemCount: _activityItemsCount(activityData),
+                  itemCount: _activityItemsCount(adventureData),
                   shrinkWrap: true,
                   itemBuilder: (context, index) =>
-                      _buildActivity(activityData, index)),
+                      _buildActivity(adventureData, index)),
             ),
             const Gap(20),
             Expanded(
@@ -116,7 +117,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     };
   }
 
-  int _activityItemsCount(ActivityData data) {
+  int _activityItemsCount(HyllData data) {
     return switch (data.state) {
       (AdventureState.loading) => 10,
       (AdventureState.loaded) => data.activites.length,
@@ -124,7 +125,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     };
   }
 
-  Widget _buildActivity(ActivityData data, int index) {
+  Widget _buildActivity(HyllData data, int index) {
     return switch (data.state) {
       (AdventureState.loading) => Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
@@ -139,19 +140,15 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
           ),
         ),
-      (AdventureState.loaded) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: AppColors.white,
-          ),
-          child: Center(
-            child: Text(
-              data.activites[index].name,
-              style: fontPoppinsW400(appcolor: AppColors.textColor)
-                  .copyWith(fontSize: 12),
-            ),
-          ),
+      (AdventureState.loaded) => ActivityWidget(
+          activites: data.activites,
+          index: index,
+          selectedActivity: selectedActivity,
+          onTap: () {
+            setState(() {
+              selectedActivity = index;
+            });
+          },
         ),
       (AdventureState.error) => const SizedBox()
     };
