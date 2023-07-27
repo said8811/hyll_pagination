@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:hyll/main/domain/model/adventure_data.dart';
 import 'package:hyll/main/domain/model/hyll_states.dart';
-import 'package:hyll/main/infrasturcture/helpers/get_urls.dart';
 import 'package:hyll/main/presentation/pages/video_player.dart';
 import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -103,9 +102,7 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                           fontSize: 16.0);
                     }
                   },
-                  imageUrl: getImageURls(data.adventure.contents!
-                      .where((element) => element.contentType == "IMAGE")
-                      .toList()),
+                  imageUrl: data.adventure.contents![0].contentUrl!,
                   title: data.adventure.title!,
                   primaryDescription: data.adventure.description!,
                   tags: data.adventure.tags!,

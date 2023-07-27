@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:hyll/main/domain/model/activity_model.dart';
 import 'package:hyll/main/domain/model/adventure_model.dart';
 import 'package:hyll/main/domain/model/failure.dart';
 import 'package:hyll/main/domain/model/hyll_model.dart';
@@ -12,7 +13,6 @@ class HyllDataRepository {
     final Response<Map<String, dynamic>> response = await dio.get(
       url,
     );
-
     if (response.statusCode == 200) {
       return right(HyllDataModel.fromJson(response.data!));
     } else {
@@ -27,6 +27,20 @@ class HyllDataRepository {
 
     if (response.statusCode == 200) {
       return right(AdventureModel.fromJson(response.data!));
+    } else {
+      return left(Failure(error: "error ${response.statusCode}"));
+    }
+  }
+
+  Future<Either<Failure, List<ActivityModel>>> getActivity() async {
+    final Response<Map<String, dynamic>> response = await dio.get(
+      "https://api.hyll.com/api/activities/",
+    );
+
+    if (response.statusCode == 200 && response.data!['data'] != null) {
+      return right((response.data!['data'] as List)
+          .map((e) => ActivityModel.fromJson(e))
+          .toList());
     } else {
       return left(Failure(error: "error ${response.statusCode}"));
     }
