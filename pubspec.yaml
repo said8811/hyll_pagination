@@ -50,6 +50,7 @@ dependencies:
   fluttertoast: ^8.2.2
   video_player: ^2.7.0
   get: ^4.6.5
+  holding_gesture: ^1.1.0
   flutter_svg: ^2.0.7
 
 dev_dependencies:

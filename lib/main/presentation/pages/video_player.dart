@@ -46,10 +46,14 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
         body: SafeArea(
           child: Stack(
             children: [
-              Center(
-                child: AspectRatio(
-                  aspectRatio: controller.value.aspectRatio,
-                  child: VideoPlayer(controller),
+              GestureDetector(
+                onLongPress: () => controller.pause(),
+                onLongPressEnd: (details) => controller.play(),
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: controller.value.aspectRatio,
+                    child: VideoPlayer(controller),
+                  ),
                 ),
               ),
               Column(
