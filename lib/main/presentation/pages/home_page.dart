@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:hyll/main/presentation/style/colors.dart';
 import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
 import 'package:hyll/main/presentation/widgets/loading_widget.dart';
@@ -119,7 +120,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   int _activityItemsCount(HyllData data) {
     return switch (data.state) {
-      (AdventureState.loading) => 10,
+      (AdventureState.loading) => data.activites.length + 10,
       (AdventureState.loaded) => data.activites.length,
       (AdventureState.error) => 0
     };
@@ -127,19 +128,30 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget _buildActivity(HyllData data, int index) {
     return switch (data.state) {
-      (AdventureState.loading) => Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 15,
-            width: 60,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: AppColors.white,
+      (AdventureState.loading) => index >= data.activites.length
+          ? Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 15,
+                width: 60,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.white,
+                ),
+              ),
+            )
+          : ActivityWidget(
+              activites: data.activites,
+              index: index,
+              selectedActivity: selectedActivity,
+              onTap: () {
+                setState(() {
+                  selectedActivity = index;
+                });
+              },
             ),
-          ),
-        ),
       (AdventureState.loaded) => ActivityWidget(
           activites: data.activites,
           index: index,
@@ -160,12 +172,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           ? const ShimmerLoading()
           : GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AdventurePage(
-                          id: data.adventures[index].id.toString()),
-                    ));
+                Get.to(AdventurePage(id: data.adventures[index].id.toString()),
+                    transition: Transition.fade);
               },
               child: AdventureWidget(
                 imageUrl: data.adventures[index].contents![0].contentUrl!,

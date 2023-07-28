@@ -14,7 +14,7 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
             state: AdventureState.loading)) {
     fetchData("https://api.hyll.com/api/adventures");
   }
-  List<String> activity = ["All"];
+  List<String> activity = [];
 
   fetchData(String url) async {
     state = HyllData(
@@ -36,13 +36,12 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
           activity.add(a.activity!);
         }
       }
-      r.data!.sort((a, b) => a.activity!.compareTo(b.activity!));
+      state.adventures.addAll(r.data!);
+      state.adventures.sort((a, b) => a.activity!.compareTo(b.activity!));
+      activity.sort((a, b) => a.compareTo(b));
       return HyllData(
           activites: activity,
-          adventures: [
-            ...state.adventures,
-            ...r.data!,
-          ],
+          adventures: state.adventures,
           nextPageUrl: r.next,
           state: AdventureState.loaded);
     });

@@ -1,15 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:hyll/main/domain/model/adventure_data.dart';
 import 'package:hyll/main/domain/model/hyll_states.dart';
 import 'package:hyll/main/presentation/pages/video_player.dart';
-import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hyll/main/shared/providers.dart';
 
-import '../../domain/model/hyll_model.dart';
 import '../style/colors.dart';
 
 class AdventurePage extends ConsumerStatefulWidget {
@@ -24,6 +26,7 @@ class AdventurePage extends ConsumerStatefulWidget {
 }
 
 class _AdventurePageState extends ConsumerState<AdventurePage> {
+  int selectedImage = 0;
   @override
   void initState() {
     ref.read(adventureNotifierProvider.notifier).getSingleData(widget.id);
@@ -33,7 +36,7 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(adventureNotifierProvider);
-    return Scaffold(body: SafeArea(child: _buildAdventure(data)));
+    return Scaffold(body: _buildAdventure(data));
   }
 
   Widget _buildAdventure(AdventureData data) {
@@ -45,68 +48,135 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        data.adventure.authorUser!.profilePicture!,
+              Stack(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl:
+                        data.adventure.contents![selectedImage].contentUrl!,
+                    imageBuilder: (context, imageProvider) => Container(
+                      padding: const EdgeInsets.all(120),
+                      alignment: Alignment.topRight,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      minRadius: 10,
-                      maxRadius: 25,
                     ),
-                    const Gap(10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          data.adventure.externalAuthor!,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        padding: const EdgeInsets.all(120),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
                         ),
-                        const Gap(10),
-                        Text(
-                          data.adventure.authorUser!.hyllUsername!,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                  Positioned(
+                      top: 30,
+                      left: 20,
+                      child: IconButton(
+                          onPressed: () => Get.back(),
+                          icon: SvgPicture.asset("assets/svg/back_icon.svg"))),
+                  Positioned(
+                      top: 30,
+                      right: 20,
+                      child: IconButton(
+                          onPressed: () {},
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.favorite,
+                              color: AppColors.favoriteColor,
+                            ),
+                          ))),
+                ],
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [AppColors.gradientFirst, AppColors.bgColor])),
+                height: 100,
+                width: double.infinity,
+                child: ListView.separated(
+                  separatorBuilder: (context, index) => const Gap(15),
+                  scrollDirection: Axis.horizontal,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  shrinkWrap: true,
+                  itemCount: data.adventure.contents!.length,
+                  itemBuilder: (context, index) {
+                    final content = data.adventure.contents![index];
+                    return CachedNetworkImage(
+                      imageUrl: content.contentType == "VIDEO"
+                          ? data.adventure.contents![0].contentUrl!
+                          : content.contentUrl!,
+                      imageBuilder: (context, snapshot) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (content.contentType == "VIDEO") {
+                                Get.to(
+                                  VideoPLayPage(
+                                    videoUrl: content.contentUrl!,
+                                  ),
+                                );
+                              } else {
+                                selectedImage = index;
+                              }
+                            });
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  data.adventure.contents![index].contentType ==
+                                          "VIDEO"
+                                      ? data.adventure.contents![0].contentUrl!
+                                      : data.adventure.contents![index]
+                                          .contentUrl!,
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            child: Center(
+                              child:
+                                  data.adventure.contents![index].contentType ==
+                                          "VIDEO"
+                                      ? const Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                        )
+                                      : const SizedBox(),
+                            ),
+                          ),
+                        );
+                      },
+                      placeholder: (context, url) => Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          height: 50,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
                         ),
-                      ],
-                    )
-                  ],
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    );
+                  },
                 ),
               ),
-              AdventureWidget(
-                  onTap: () {
-                    if (data.adventure.contents!
-                        .any((element) => element.contentType == "VIDEO")) {
-                      Contents content = data.adventure.contents!.firstWhere(
-                          (element) => element.contentType == "VIDEO");
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoPLayPage(
-                              videoUrl: content.contentUrl!,
-                            ),
-                          ));
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "This adventure doesn't have video",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: AppColors.primary,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    }
-                  },
-                  imageUrl: data.adventure.contents![0].contentUrl!,
-                  title: data.adventure.title!,
-                  primaryDescription: data.adventure.description!,
-                  tags: data.adventure.tags!,
-                  id: data.adventure.id.toString()),
               const Gap(10),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -213,3 +283,24 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
     };
   }
 }
+//  if (data.adventure.contents!
+                    //     .any((element) => element.contentType == "VIDEO")) {
+                    //   Contents content = data.adventure.contents!.firstWhere(
+                    //       (element) => element.contentType == "VIDEO");
+                    //   Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => VideoPLayPage(
+                    //           videoUrl: content.contentUrl!,
+                    //         ),
+                    //       ));
+                    // } else {
+                    //   Fluttertoast.showToast(
+                    //       msg: "This adventure doesn't have video",
+                    //       toastLength: Toast.LENGTH_SHORT,
+                    //       gravity: ToastGravity.CENTER,
+                    //       timeInSecForIosWeb: 1,
+                    //       backgroundColor: AppColors.primary,
+                    //       textColor: Colors.white,
+                    //       fontSize: 16.0);
+                    // }
