@@ -172,8 +172,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           ? const ShimmerLoading()
           : GestureDetector(
               onTap: () {
-                Get.to(AdventurePage(id: data.adventures[index].id.toString()),
-                    transition: Transition.fade);
+                Get.to(
+                  AdventurePage(id: data.adventures[index].id.toString()),
+                  transition: Transition.fade,
+                );
               },
               child: AdventureWidget(
                 imageUrl: data.adventures[index].contents![0].contentUrl!,

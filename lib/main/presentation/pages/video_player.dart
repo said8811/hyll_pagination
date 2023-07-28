@@ -23,11 +23,16 @@ class _VideoPLayPageState extends State<VideoPLayPage> {
     controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.videoUrl),
     )
-      ..addListener(() => setState(() {
-            if (controller.value.position >= controller.value.duration) {
-              isVideoEnded = true;
-            }
-          }))
+      ..addListener(() {
+        if (controller.value.isPlaying) {
+          setState(() {});
+        }
+        if (controller.value.position >= controller.value.duration) {
+          setState(() {
+            isVideoEnded = true;
+          });
+        }
+      })
       ..initialize().then((_) {
         controller.play();
       });

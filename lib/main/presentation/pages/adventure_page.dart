@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hyll/main/domain/model/adventure_data.dart';
 import 'package:hyll/main/domain/model/hyll_states.dart';
 import 'package:hyll/main/presentation/pages/video_player.dart';
+import 'package:hyll/main/presentation/style/style.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hyll/main/shared/providers.dart';
@@ -97,9 +98,7 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                 ],
               ),
               Container(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [AppColors.gradientFirst, AppColors.bgColor])),
+                decoration: BoxDecoration(color: AppColors.bgColor),
                 height: 100,
                 width: double.infinity,
                 child: ListView.separated(
@@ -178,102 +177,60 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                 ),
               ),
               const Gap(10),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Activity",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Gap(8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Text(
-                      data.adventure.activity!,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
-                    const Spacer(),
-                    Image.network(
-                      data.adventure.activityIcon!,
-                      width: 40,
-                    ),
-                  ],
+                child: Text(
+                  data.adventure.startingLocation!.name!,
+                  style: fontPoppinsW700(appcolor: AppColors.textColor)
+                      .copyWith(fontSize: 20),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "Liechtenstin",
+                  style: fontPoppinsW400(appcolor: AppColors.textColor)
+                      .copyWith(fontSize: 14),
+                ),
+              ),
+              const Gap(18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  data.adventure.description!,
+                  style: fontPoppinsW400(appcolor: AppColors.textColor)
+                      .copyWith(fontSize: 14),
                 ),
               ),
               const Gap(14),
-              Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.white),
-                child: ExpansionTile(
-                  title: const Text("Tags"),
-                  childrenPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  children: [
-                    Wrap(children: [
-                      ...List.generate(
-                          data.adventure.tags!.length,
-                          (index) => Card(
-                                elevation: 2,
-                                margin: const EdgeInsets.all(5),
-                                child: Text(
-                                  "  #${data.adventure.tags![index]}  ",
-                                  style: TextStyle(color: AppColors.tagColor),
-                                ),
-                              ))
-                    ]),
-                  ],
-                ),
-              ),
-              Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.white),
-                child: ExpansionTile(
-                  title: const Text("Facts"),
-                  childrenPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  children: [
-                    ...List.generate(
-                        data.adventure.facts!.length,
-                        (index) => ExpansionTile(
-                              leading: Image.network(
-                                data.adventure.facts![index].iconUrl ??
-                                    "https://res.cloudinary.com/hyll/image/upload/v1/media/adventures/icons/slope-uphill_mkva9h_zw6llb",
-                                width: 40,
-                              ),
-                              childrenPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              title: Text(data.adventure.facts![index].name!),
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    data.adventure.facts![index].value ??
-                                        "No info",
-                                    textAlign: TextAlign.left,
-                                  ),
-                                )
-                              ],
-                            )),
-                  ],
-                ),
-              ),
               ListTile(
-                title: Text(data.adventure.startingLocation!.name!),
-                subtitle: Text(data.adventure.startingLocation!.address!),
-                trailing: IconButton(
-                    onPressed: () async {
-                      if (!await launchUrl(Uri.parse(
-                          "https://www.google.com/maps/search/?api=1&query=${data.adventure.startingLocation!.lat},${data.adventure.startingLocation!.lng}"))) {
-                        Fluttertoast.showToast(
-                            msg: "We can not open address",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: AppColors.primary,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      }
-                    },
-                    icon: const Icon(Icons.location_on)),
-              )
+                onTap: () async {
+                  if (!await launchUrl(Uri.parse(
+                      "https://www.google.com/maps/search/?api=1&query=${data.adventure.startingLocation!.lat},${data.adventure.startingLocation!.lng}"))) {
+                    Fluttertoast.showToast(
+                        msg: "We can not open address",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: AppColors.primary,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                  }
+                },
+                title: Text(
+                  data.adventure.startingLocation!.name!,
+                  style: fontPoppinsW400(appcolor: AppColors.textColor)
+                      .copyWith(fontSize: 10),
+                ),
+                subtitle: Text(
+                  data.adventure.startingLocation!.address!,
+                  style: fontPoppinsW600(appcolor: AppColors.textColor)
+                      .copyWith(fontSize: 14),
+                ),
+                leading: SvgPicture.asset("assets/svg/location.svg"),
+              ),
+              const Gap(20),
+              Image.asset("assets/images/location.jpg")
             ],
           ),
         ),
