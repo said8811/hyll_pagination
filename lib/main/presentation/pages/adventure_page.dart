@@ -230,7 +230,6 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                 leading: SvgPicture.asset("assets/svg/location.svg"),
               ),
               const Gap(20),
-              Image.asset("assets/images/location.jpg")
             ],
           ),
         ),
@@ -240,24 +239,3 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
     };
   }
 }
-//  if (data.adventure.contents!
-                    //     .any((element) => element.contentType == "VIDEO")) {
-                    //   Contents content = data.adventure.contents!.firstWhere(
-                    //       (element) => element.contentType == "VIDEO");
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => VideoPLayPage(
-                    //           videoUrl: content.contentUrl!,
-                    //         ),
-                    //       ));
-                    // } else {
-                    //   Fluttertoast.showToast(
-                    //       msg: "This adventure doesn't have video",
-                    //       toastLength: Toast.LENGTH_SHORT,
-                    //       gravity: ToastGravity.CENTER,
-                    //       timeInSecForIosWeb: 1,
-                    //       backgroundColor: AppColors.primary,
-                    //       textColor: Colors.white,
-                    //       fontSize: 16.0);
-                    // }
