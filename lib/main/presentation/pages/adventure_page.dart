@@ -230,6 +230,16 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                 leading: SvgPicture.asset("assets/svg/location.svg"),
               ),
               const Gap(20),
+              Container(
+                height: 200,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/images/location.jpg"),
+                        fit: BoxFit.cover),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25))),
+              )
             ],
           ),
         ),
