@@ -6,15 +6,25 @@ enum AdventureState {
   error,
 }
 
-class HyllData {
+class AdventureWithActivity {
   final List<Data> adventures;
+  final String activity;
+
+  AdventureWithActivity({
+    required this.adventures,
+    required this.activity,
+  });
+}
+
+class HyllData {
+  final List<AdventureWithActivity> adventureWithActivity;
   final List<String> activites;
 
   final String? nextPageUrl;
   final AdventureState state;
 
   HyllData({
-    required this.adventures,
+    required this.adventureWithActivity,
     required this.activites,
     required this.nextPageUrl,
     required this.state,

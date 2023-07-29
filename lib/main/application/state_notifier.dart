@@ -9,7 +9,7 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
   AdventuresNotifier(this.repository)
       : super(HyllData(
             activites: [],
-            adventures: [],
+            adventureWithActivity: [],
             nextPageUrl: null,
             state: AdventureState.loading)) {
     fetchData("https://api.hyll.com/api/adventures");
@@ -19,7 +19,7 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
   fetchData(String url) async {
     state = HyllData(
       activites: state.activites,
-      adventures: state.adventures,
+      adventureWithActivity: state.adventureWithActivity,
       nextPageUrl: state.nextPageUrl,
       state: AdventureState.loading,
     );
@@ -28,20 +28,24 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
     state = response.fold(
         (l) => HyllData(
             activites: state.activites,
-            adventures: state.adventures,
+            adventureWithActivity: state.adventureWithActivity,
             nextPageUrl: state.nextPageUrl,
             state: AdventureState.error), (r) {
       for (var a in r.data!) {
         if (!activity.contains(a.activity)) {
           activity.add(a.activity!);
+          final AdventureWithActivity adventureWithActivity =
+              AdventureWithActivity(
+                  adventures: r.data!
+                      .where((element) => element.activity == a.activity)
+                      .toList(),
+                  activity: a.activity!);
+          state.adventureWithActivity.add(adventureWithActivity);
         }
       }
-      state.adventures.addAll(r.data!);
-      state.adventures.sort((a, b) => a.activity!.compareTo(b.activity!));
-      activity.sort((a, b) => a.compareTo(b));
       return HyllData(
           activites: activity,
-          adventures: state.adventures,
+          adventureWithActivity: state.adventureWithActivity,
           nextPageUrl: r.next,
           state: AdventureState.loaded);
     });
@@ -52,24 +56,30 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
       final HyllDataModel? newData = await fetchData(state.nextPageUrl!);
       state = HyllData(
         activites: activity,
-        adventures: state.adventures,
+        adventureWithActivity: state.adventureWithActivity,
         nextPageUrl: state.nextPageUrl,
         state: AdventureState.loading,
       );
       if (newData != null) {
-        List<Data> adventures = state.adventures;
-
-        adventures.addAll(newData.data!);
+        final adventures = state.adventureWithActivity;
+        for (var a in newData.data!) {
+          final advenAndActivity = AdventureWithActivity(
+              adventures: newData.data!
+                  .where((element) => element.activity == a.activity)
+                  .toList(),
+              activity: a.activity!);
+          adventures.add(advenAndActivity);
+        }
         state = HyllData(
           activites: [],
-          adventures: adventures,
+          adventureWithActivity: adventures,
           nextPageUrl: newData.next,
           state: AdventureState.loaded,
         );
       } else {
         state = HyllData(
           activites: state.activites,
-          adventures: state.adventures,
+          adventureWithActivity: state.adventureWithActivity,
           nextPageUrl: state.nextPageUrl,
           state: AdventureState.loaded,
         );
@@ -77,7 +87,7 @@ class AdventuresNotifier extends StateNotifier<HyllData> {
     } catch (error) {
       state = HyllData(
         activites: state.activites,
-        adventures: state.adventures,
+        adventureWithActivity: state.adventureWithActivity,
         nextPageUrl: state.nextPageUrl,
         state: AdventureState.error,
       );

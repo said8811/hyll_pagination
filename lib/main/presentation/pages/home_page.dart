@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:hyll/main/presentation/style/colors.dart';
-import 'package:hyll/main/presentation/widgets/adventure_widget.dart';
+import 'package:hyll/main/presentation/widgets/adventures_list.dart';
 import 'package:hyll/main/presentation/widgets/loading_widget.dart';
 import 'package:hyll/main/shared/providers.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../domain/model/hyll_states.dart';
 import '../style/style.dart';
 import '../widgets/activity_widget.dart';
-import 'adventure_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -22,24 +21,51 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  ScrollController scrollController = ScrollController();
+  ItemScrollController adventurescrollController = ItemScrollController();
+  final adventureScrollListener = ItemPositionsListener.create();
+  ItemScrollController activityscrollController = ItemScrollController();
+  final activityScrollListener = ItemPositionsListener.create();
   int selectedActivity = 0;
+  bool isAdventureScrolling = false;
 
   @override
   void initState() {
-    super.initState();
-
-    // Attach the scroll listener to fetch the next page when reaching the bottom
-    scrollController.addListener(() {
-      if (scrollController.position.pixels >
-              scrollController.position.maxScrollExtent / 1.5 &&
-          scrollController.position.pixels != 0 &&
-          ref.read(hyllNotifierProvider).state != AdventureState.loading &&
-          ref.read(hyllNotifierProvider).nextPageUrl != null) {
-        debugPrint("loading");
-        ref.read(hyllNotifierProvider.notifier).fetchNextPage();
+    adventureScrollListener.itemPositions.addListener(() {
+      final indexes =
+          adventureScrollListener.itemPositions.value.map((e) => e).toList();
+      if (ref.read(hyllNotifierProvider).state == AdventureState.loaded) {
+        if (ref
+                    .watch(hyllNotifierProvider)
+                    .adventureWithActivity[indexes.first.index]
+                    .activity !=
+                ref.watch(hyllNotifierProvider).activites[selectedActivity] &&
+            !isAdventureScrolling) {
+          setState(() {
+            selectedActivity = indexes.first.index;
+          });
+          activityscrollController.scrollTo(
+              index: indexes.first.index,
+              duration: const Duration(milliseconds: 300));
+        }
+        if (indexes.any((e) =>
+                e.index >=
+                ref.watch(hyllNotifierProvider).adventureWithActivity.length -
+                    2) &&
+            ref.read(hyllNotifierProvider).nextPageUrl != null) {
+          ref.watch(hyllNotifierProvider.notifier).fetchNextPage();
+        }
       }
     });
+    super.initState();
+  }
+
+  Future scrollToItem(int index) async {
+    isAdventureScrolling = true;
+    await adventurescrollController.scrollTo(
+      index: index,
+      duration: const Duration(milliseconds: 300),
+    );
+    isAdventureScrolling = false;
   }
 
   @override
@@ -57,11 +83,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(color: AppColors.bgColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Gap(20),
             TextField(
               decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
@@ -84,7 +111,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             const Gap(20),
             SizedBox(
               height: 30,
-              child: ListView.separated(
+              child: ScrollablePositionedList.separated(
+                  itemScrollController: activityscrollController,
+                  itemPositionsListener: activityScrollListener,
                   separatorBuilder: (context, index) => const Gap(10),
                   scrollDirection: Axis.horizontal,
                   itemCount: _activityItemsCount(adventureData),
@@ -94,10 +123,11 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const Gap(20),
             Expanded(
-              child: ListView.separated(
+              child: ScrollablePositionedList.separated(
                 separatorBuilder: (context, index) => const Gap(10),
                 shrinkWrap: true,
-                controller: scrollController,
+                itemScrollController: adventurescrollController,
+                itemPositionsListener: adventureScrollListener,
                 itemCount: _itemsCount(adventureData),
                 itemBuilder: (context, index) {
                   return _buildList(adventureData, index);
@@ -112,8 +142,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   int _itemsCount(HyllData data) {
     return switch (data.state) {
-      (AdventureState.loading) => data.adventures.length + 15,
-      (AdventureState.loaded) => data.adventures.length,
+      (AdventureState.loading) => data.adventureWithActivity.length + 15,
+      (AdventureState.loaded) => data.adventureWithActivity.length,
       (AdventureState.error) => 1
     };
   }
@@ -150,6 +180,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 setState(() {
                   selectedActivity = index;
                 });
+                scrollToItem(index);
               },
             ),
       (AdventureState.loaded) => ActivityWidget(
@@ -159,6 +190,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           onTap: () {
             setState(() {
               selectedActivity = index;
+              scrollToItem(index);
             });
           },
         ),
@@ -168,45 +200,18 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget _buildList(HyllData data, int index) {
     return switch (data.state) {
-      (AdventureState.loading) => data.adventures.length <= index
+      (AdventureState.loading) => data.adventureWithActivity.length <= index
           ? const ShimmerLoading()
-          : GestureDetector(
-              onTap: () {
-                Get.to(
-                  AdventurePage(id: data.adventures[index].id.toString()),
-                  transition: Transition.fade,
-                );
-              },
-              child: AdventureWidget(
-                imageUrl: data.adventures[index].contents![0].contentUrl!,
-                title:
-                    data.adventures[index].startingLocation!.name ?? "UnNamed",
-                primaryDescription:
-                    data.adventures[index].startingLocation!.subtitle ??
-                        "Liechtenstin",
-                tags: data.adventures[index].tags!,
-                id: data.adventures[index].id.toString(),
-              ),
-            ),
-      (AdventureState.loaded) => GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      AdventurePage(id: data.adventures[index].id.toString()),
-                ));
-          },
-          child: AdventureWidget(
-            imageUrl: data.adventures[index].contents![0].contentUrl!,
-            title: data.adventures[index].startingLocation!.name ?? "UnNamed",
-            primaryDescription:
-                data.adventures[index].startingLocation!.subtitle ??
-                    "Liechtenstin",
-            tags: data.adventures[index].tags!,
-            id: data.adventures[index].id.toString(),
-          ),
-        ),
+          : AdventuresListView(
+              adventures: data.adventureWithActivity[index].adventures
+                  .where((element) => element.activity == data.activites[index])
+                  .toList(),
+              activity: data.activites[index]),
+      (AdventureState.loaded) => AdventuresListView(
+          adventures: data.adventureWithActivity[index].adventures
+              .where((element) => element.activity == data.activites[index])
+              .toList(),
+          activity: data.activites[index]),
       (AdventureState.error) => const Center(
           child: Text("An error occurred while fetching data."),
         ),
@@ -215,7 +220,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   void dispose() {
-    scrollController.dispose();
     super.dispose();
   }
 }

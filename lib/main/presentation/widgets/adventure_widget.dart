@@ -10,7 +10,6 @@ class AdventureWidget extends StatefulWidget {
   final String imageUrl;
   final String title;
   final String primaryDescription;
-  final List<String> tags;
   final String id;
   VoidCallback? onTap;
   AdventureWidget(
@@ -18,7 +17,6 @@ class AdventureWidget extends StatefulWidget {
       required this.imageUrl,
       required this.title,
       required this.primaryDescription,
-      required this.tags,
       required this.id,
       this.onTap});
 
